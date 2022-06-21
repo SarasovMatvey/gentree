@@ -3,6 +3,8 @@
 namespace App\Gentree\RawProviders;
 
 use App\Gentree\Dto\RawItem;
+use App\Gentree\RawValidators\CsvRawValidator;
+use Exception;
 use League\Csv\Reader;
 
 class CsvRawProvider implements RawProviderInterface
@@ -15,8 +17,16 @@ class CsvRawProvider implements RawProviderInterface
      * @return void
      *
      * @throws \League\Csv\Exception
+     * @throws Exception
      */
     public function addCsvFile(string $path) {
+        $validator = new CsvRawValidator();
+        $validator->addCsvFile($path);
+        $validationResult = $validator->isValid();
+
+        // TODO: add custom exceptions
+        if (!$validationResult->isValid) throw new Exception($validationResult->errorMessage);
+
         // TODO: handle open file error
         $this->csvFile = Reader::createFromPath($path, 'r');
     }
