@@ -15,6 +15,11 @@ class FormattedItem
     public $parent;
 
     /**
+     * @var string
+     */
+    public $type;
+
+    /**
      * @var FormattedItem[]
      */
     public $children;
@@ -24,7 +29,7 @@ class FormattedItem
      * @param string $parent
      * @param FormattedItem[] $children
      */
-    public function __construct(string $name, ?string $parent, array $children)
+    public function __construct(string $name, ?string $parent, string $type, array $children)
     {
         $this->name = $name;
         $this->parent = $parent;

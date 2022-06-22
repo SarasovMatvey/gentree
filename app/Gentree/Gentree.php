@@ -6,6 +6,15 @@ use App\Gentree\Dto\FormattedItem;
 use App\Gentree\Dto\RawItem;
 use App\Gentree\RawProviders\RawProviderInterface;
 use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function fopen;
+use function fwrite;
+use function json_decode;
+use function json_encode;
+use function var_dump;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_UNICODE;
 
 /**
  * Class for generating json tree from csv file
@@ -13,28 +22,31 @@ use function array_key_exists;
 class Gentree
 {
     /**
+     * @var $indexOfAllRawItems array<string, RawItem>
+     */
+    private $indexOfAllRawItems = [];
+
+    /**
+     * @var $indexOfSameLayerRawItemsGroups array<string, RawItem>
+     */
+    private $indexOfSameLayerRawItemsGroups = [];
+
+    /**
      * @param $dataProvider RawProviderInterface
      *
      * @reture FormattedItem[]
      */
-    public static function generateTree($dataProvider): array
+    public function generateTree($dataProvider): array
     {
         $raw = $dataProvider->provideRaw();
 
-        $indexOfAllRawItems = [];
-        $indexOfSameLayerRawItemsGroups = [];
-        $completedBranchesLinks = [];
-
         foreach ($raw as $rawItem) {
-            $indexOfAllRawItems[$rawItem->name] = $rawItem;
-            $indexOfSameLayerRawItemsGroups[$rawItem->parent][] = $rawItem;
+            $this->indexOfAllRawItems[$rawItem->name] = $rawItem;
+            $this->indexOfSameLayerRawItemsGroups[$rawItem->parent][] = $rawItem;
         }
 
-        return self::generateRecursive([
-            'indexOfAllRawItems' => $indexOfAllRawItems,
-            'indexOfSameLayerRawItemsGroups' => $indexOfSameLayerRawItemsGroups,
-            'completedBranchesLinks' => $completedBranchesLinks
-        ], '');
+
+        return self::generateRecursive('');
     }
 
     /**
@@ -44,23 +56,17 @@ class Gentree
      *
      * @return Dto\FormattedItem[]
      */
-    private static function generateRecursive(array $prerequisites, string $startRawItemName, string $rewritableParentName = null): array
+    private function generateRecursive(string $startRawItemName, string $rewritableParentName = null): array
     {
-        /** @var $indexOfAllRawItems array<string, RawItem> */
-        $indexOfAllRawItems = $prerequisites['indexOfAllRawItems'];
-        /** @var $indexOfSameLayerRawItemsGroups array<string, RawItem> */
-        $indexOfSameLayerRawItemsGroups = $prerequisites['indexOfSameLayerRawItemsGroups'];
-        $completedBranchesLinks = $prerequisites['completedBranchesLinks'];
-
         /** @var  $tree FormattedItem[] */
         $tree = [];
 
-        if (!array_key_exists($startRawItemName, $indexOfSameLayerRawItemsGroups)) {
+        if (!array_key_exists($startRawItemName, $this->indexOfSameLayerRawItemsGroups)) {
             return [];
         }
 
         /** @var  $rawItem RawItem */
-        foreach ($indexOfSameLayerRawItemsGroups[$startRawItemName] as $rawItem) {
+        foreach ($this->indexOfSameLayerRawItemsGroups[$startRawItemName] as $rawItem) {
             $parentName = '';
 
             if ($rewritableParentName !== null) {
@@ -71,7 +77,7 @@ class Gentree
                 $parentName = $rawItem->parent;
             }
 
-            $formattedItem = new FormattedItem($rawItem->name, $parentName, []);
+            $formattedItem = new FormattedItem($rawItem->name, $parentName, $rawItem->type, []);
             $tree[] = $formattedItem;
         }
 
@@ -79,10 +85,10 @@ class Gentree
             /** @var  $tree FormattedItem[] */
             $itemSubtree = [];
 
-            if ($indexOfAllRawItems[$treeItem->name]->relation !== '') {
-                $itemSubtree = self::generateRecursive($prerequisites, $indexOfAllRawItems[$treeItem->name]->relation, $treeItem->name);
+            if ($this->indexOfAllRawItems[$treeItem->name]->relation !== '') {
+                $itemSubtree = self::generateRecursive($this->indexOfAllRawItems[$treeItem->name]->relation, $treeItem->name);
             } else {
-                $itemSubtree = self::generateRecursive($prerequisites, $treeItem->name);
+                $itemSubtree = self::generateRecursive($treeItem->name);
             }
 
             $treeItem->children = $itemSubtree;

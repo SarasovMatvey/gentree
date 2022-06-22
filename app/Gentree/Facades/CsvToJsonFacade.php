@@ -13,7 +13,8 @@ class CsvToJsonFacade
         $csvRawProvider = new CsvRawProvider();
         $csvRawProvider->addCsvFile($csvFilePath);
 
-        $tree = Gentree::generateTree($csvRawProvider);
+        $gentree = new Gentree();
+        $tree = $gentree->generateTree($csvRawProvider);
 
         return JsonSerializer::serialize($tree);
     }
