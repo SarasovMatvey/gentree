@@ -4,7 +4,6 @@ namespace App\Gentree\Serializers;
 
 class JsonSerializer implements SerializerInterface
 {
-
     /**
      * @inheritDoc
      *
@@ -15,7 +14,12 @@ class JsonSerializer implements SerializerInterface
         return json_encode(self::convertToJsonAsArray($formattedItemsTree), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
-    private static function convertToJsonAsArray(array $formattedItemsTree)
+    /**
+     * @param array $formattedItemsTree
+     *
+     * @return array
+     */
+    private static function convertToJsonAsArray(array $formattedItemsTree): array
     {
         $jsonAsArray = [];
 

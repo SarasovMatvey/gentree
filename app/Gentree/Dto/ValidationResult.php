@@ -4,7 +4,14 @@ namespace App\Gentree\Dto;
 
 class ValidationResult
 {
+    /**
+     * @var bool
+     */
     public $isValid;
+
+    /**
+     * @var string|null
+     */
     public $errorMessage = null;
 
     /**

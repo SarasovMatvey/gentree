@@ -3,22 +3,30 @@
 namespace App\Gentree\RawValidators;
 
 use App\Gentree\Dto\ValidationResult;
-use League\Csv\AbstractCsv;
 use League\Csv\Reader;
 use League\Csv\Statement;
 
 class CsvRawValidator implements RawValidatorInterface
 {
     /**
-     * @var AbstractCsv|null
+     * @var Reader|null
      */
     private $csvFile = null;
 
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
     public function addCsvFile(string $path) {
-        // TODO: handle open file error
         $this->csvFile = Reader::createFromPath($path, 'r');
     }
 
+    /**
+     * @return ValidationResult
+     *
+     * @throws \League\Csv\Exception
+     */
     public function isValid(): ValidationResult
     {
         $this->csvFile->setDelimiter(';');

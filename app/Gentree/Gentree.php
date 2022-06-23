@@ -6,15 +6,6 @@ use App\Gentree\Dto\FormattedItem;
 use App\Gentree\Dto\RawItem;
 use App\Gentree\RawProviders\RawProviderInterface;
 use function array_key_exists;
-use function array_keys;
-use function array_map;
-use function fopen;
-use function fwrite;
-use function json_decode;
-use function json_encode;
-use function var_dump;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_UNICODE;
 
 /**
  * Class for generating json tree from csv file
@@ -34,9 +25,9 @@ class Gentree
     /**
      * @param $dataProvider RawProviderInterface
      *
-     * @reture FormattedItem[]
+     * @return FormattedItem[]
      */
-    public function generateTree($dataProvider): array
+    public function generateTree(RawProviderInterface $dataProvider): array
     {
         $raw = $dataProvider->provideRaw();
 
@@ -45,14 +36,16 @@ class Gentree
             $this->indexOfSameLayerRawItemsGroups[$rawItem->parent][] = $rawItem;
         }
 
+        $tree = self::generateRecursive('');
 
-        return self::generateRecursive('');
+        $this->clearParams();
+
+        return $tree;
     }
 
     /**
-     * @param $prerequisites array
      * @param $startRawItemName string
-     * @param $rewritableParentName string|null
+     * @param $rewritableParentName string|null need when subtree generating from relation property (in this case parent property must be rewritten)
      *
      * @return Dto\FormattedItem[]
      */
@@ -72,6 +65,8 @@ class Gentree
             if ($rewritableParentName !== null) {
                 $parentName = $rewritableParentName;
             } else if ($rawItem->parent  === '') {
+                // highest layer of tree has "parent" property equals "" (empty string)
+                // in formatted tree this value must be converted to "null"
                 $parentName = null;
             } else {
                 $parentName = $rawItem->parent;
@@ -95,5 +90,13 @@ class Gentree
         }
 
         return $tree;
+    }
+
+    /**
+     * @return void
+     */
+    private function clearParams() {
+        $this->indexOfAllRawItems = [];
+        $this->indexOfSameLayerRawItemsGroups = [];
     }
 }

@@ -9,6 +9,9 @@ use League\Csv\Reader;
 
 class CsvRawProvider implements RawProviderInterface
 {
+    /**
+     * @var Reader|null
+     */
     private $csvFile = null;
 
     /**
@@ -24,15 +27,15 @@ class CsvRawProvider implements RawProviderInterface
         $validator->addCsvFile($path);
         $validationResult = $validator->isValid();
 
-        // TODO: add custom exceptions
         if (!$validationResult->isValid) throw new Exception($validationResult->errorMessage);
 
-        // TODO: handle open file error
         $this->csvFile = Reader::createFromPath($path, 'r');
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws \League\Csv\Exception
      */
     public function provideRaw(): array
     {

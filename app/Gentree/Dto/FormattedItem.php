@@ -26,7 +26,8 @@ class FormattedItem
 
     /**
      * @param string $name
-     * @param string $parent
+     * @param string|null $parent
+     * @param string $type
      * @param FormattedItem[] $children
      */
     public function __construct(string $name, ?string $parent, string $type, array $children)
