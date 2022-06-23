@@ -4,6 +4,9 @@
       "App\\": "./app/"
     }
   },
+  "autoload-dev": {
+    "psr-4": { "Tests\\": "tests/" }
+  },
   "require": {
     "league/csv": "9.0.0",
     "ext-json": "*",

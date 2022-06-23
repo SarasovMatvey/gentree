@@ -1,10 +1,11 @@
 <?php
 
+namespace Tests;
+
 use App\Gentree\Dto\FormattedItem;
 use App\Gentree\Serializers\JsonSerializer;
-use PHPUnit\Framework\TestCase;
 
-class JsonSerializerTest extends TestCase
+class JsonSerializerTest extends GentreeTestCase
 {
     /**
      * @dataProvider providerSerialize

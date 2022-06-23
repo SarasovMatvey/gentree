@@ -1,9 +1,10 @@
 <?php
 
-use App\Gentree\Facades\CsvToJsonFacade;
-use PHPUnit\Framework\TestCase;
+namespace Tests;
 
-class CsvToJsonFacadeTest extends TestCase
+use App\Gentree\Facades\CsvToJsonFacade;
+
+class CsvToJsonFacadeTest extends GentreeTestCase
 {
     public function testGenerateTree()
     {
