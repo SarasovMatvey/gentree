@@ -29,7 +29,7 @@ class CsvRawValidator implements RawValidatorInterface
      */
     public function isValid(): ValidationResult
     {
-        $this->csvFile->setDelimiter(';');
+        $this->csvFile->setDelimiter($_ENV['CSV_RAW_DATA_DELIMITER']);
         $this->csvFile->setHeaderOffset(0);
 
         $stmt = new Statement();
@@ -46,9 +46,8 @@ class CsvRawValidator implements RawValidatorInterface
             return new ValidationResult(false, 'File headers are not correct');
         }
 
-        // TODO: Add magic number to app configuration
-        if($fileInfo->count() > 20000) {
-            return new ValidationResult(false, 'File contains too many entries (20 000 max)');
+        if($fileInfo->count() > $_ENV['RAW_DATA_MAX_ROWS']) {
+            return new ValidationResult(false, "File contains too many entries ({$_ENV['RAW_DATA_MAX_ROWS']})");
         }
 
         return new ValidationResult(true);

@@ -41,7 +41,7 @@ class CsvRawProvider implements RawProviderInterface
     {
         if (!$this->csvFile) return [];
 
-        $this->csvFile->setDelimiter(';');
+        $this->csvFile->setDelimiter($_ENV['CSV_RAW_DATA_DELIMITER']);
         $this->csvFile->setHeaderOffset(0);
         $items = iterator_to_array($this->csvFile->getRecords(['name', 'type', 'parent', 'relation']));
 
